@@ -29,6 +29,7 @@ cogent42 is a single-file Telegram bot that gives you complete Claude Code capab
 - **Smart message queue** -- messages that aren't injected are queued and auto-processed in order after the current task finishes
 - **Cancel in-flight queries** -- `/cancel` aborts the current query
 - **Bot personality** -- optional personality config that also evolves through knowledge extraction
+- **SOUL.md persona harness** -- optional `SOUL.md` file in the cogent42 directory defines a durable persona, tone, and working style that is injected into Claude's runtime context on every query and scheduled task
 - **Graceful shutdown** -- in-flight queries and scheduled jobs are cleanly aborted on SIGINT/SIGTERM
 - **Session resume fallback** -- automatically starts a fresh session if resume fails
 - **One-command updates** -- `/update` pulls the latest version from GitHub, restarts the bot, and confirms it's back online
@@ -105,6 +106,24 @@ Schedule recurring tasks in plain English -- no cron syntax needed:
 
 Claude parses your intent into a schedule. Tasks persist across restarts. Manage them with `/schedules` (interactive buttons) or `/unschedule <id>`.
 
+## Persona (SOUL.md)
+
+`SOUL.md` is an optional markdown file placed in the cogent42 directory (alongside `bot.js`). If present, its contents are appended to Claude's runtime system context on every query and scheduled task. Use it for durable persona, tone, and working-style guidance.
+
+- **Location:** `SOUL.md` in the cogent42 repo root
+- **Missing file:** silently skipped, no error
+- **Unreadable file:** a warning is logged to stderr and the bot continues without it
+- **Size cap:** content beyond 12,000 characters is truncated with a warning
+- **Precedence:** hardcoded safety rules > `SOUL.md` > `BOT_PERSONALITY` env var > persistent knowledge and context
+
+`BOT_PERSONALITY` still works and is applied in addition to `SOUL.md`. Use `BOT_PERSONALITY` for a quick one-liner personality, and `SOUL.md` for richer persona definitions.
+
+A starter template lives at `SOUL.example.md` — copy it to `SOUL.md` to activate:
+
+```bash
+cp SOUL.example.md SOUL.md
+```
+
 ## How Knowledge Works
 
 cogent42 maintains a persistent knowledge base across conversations:
@@ -133,6 +152,8 @@ cogent42/
   bot.js                  # Single-file entry point (ESM)
   ecosystem.config.cjs    # PM2 config (.cjs because project is ESM)
   setup.js                # Interactive setup script
+  SOUL.md                 # Optional persona harness (see Persona section)
+  SOUL.example.md         # Starter template for SOUL.md
   memory/                 # Session files + current.txt for persistence
   knowledge/              # knowledge.json, schedules.json
 ```
