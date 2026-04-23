@@ -60,6 +60,8 @@ const BOT_NAME = process.env.BOT_NAME || "cogent42";
 const BOT_PERSONALITY = process.env.BOT_PERSONALITY || "";
 const MEMORY_DIR = join(__dirname, "memory");
 const KNOWLEDGE_DIR = join(__dirname, "knowledge");
+const SOUL_FILE = join(__dirname, "SOUL.md");
+const MAX_SOUL_CHARS = 12000;
 const KNOWLEDGE_FILE = join(KNOWLEDGE_DIR, "knowledge.json");
 const SCHEDULES_FILE = join(KNOWLEDGE_DIR, "schedules.json");
 const EXTRACTION_INTERVAL = 10;
@@ -556,6 +558,24 @@ function selectRelevantKnowledge(entries, prompt) {
   return { rules, context: selected };
 }
 
+function loadSoulPrompt() {
+  if (!existsSync(SOUL_FILE)) return null;
+  try {
+    const text = readFileSync(SOUL_FILE, "utf-8").trim();
+    if (!text) return null;
+    if (text.length > MAX_SOUL_CHARS) {
+      console.warn(
+        `[soul] SOUL.md exceeds ${MAX_SOUL_CHARS} chars, truncating`
+      );
+      return text.slice(0, MAX_SOUL_CHARS);
+    }
+    return text;
+  } catch (err) {
+    console.error("[soul] Failed to read SOUL.md:", err.message);
+    return null;
+  }
+}
+
 function buildSystemPrompt(prompt) {
   const parts = [];
 
@@ -564,6 +584,13 @@ function buildSystemPrompt(prompt) {
     `CRITICAL: NEVER modify bot.js, package.json, ecosystem.config.cjs, setup.js, or .env in the cogent42 directory (${__dirname}). ` +
     `These files keep you running — editing them will crash you. If asked to change bot behavior, explain what the change would look like and suggest the user applies it manually or via /update.`
   );
+
+  const soul = loadSoulPrompt();
+  if (soul) {
+    parts.push(
+      `Your standing persona and behavioral guidance are defined in SOUL.md. Embody its tone, priorities, and working style unless the user explicitly asks otherwise or safety requires otherwise.\n\n${soul}`
+    );
+  }
 
   if (BOT_PERSONALITY) {
     parts.push(`Your personality: ${BOT_PERSONALITY}`);
