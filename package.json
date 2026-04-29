@@ -1,7 +1,7 @@
 {
-  "name": "cogent42",
+  "name": "cogent42-plus-soul",
   "version": "1.7.0",
-  "description": "Telegram bot that gives you full Claude Code access to your server",
+  "description": "Fork of cogent42 (https://github.com/cogent42/cogent42) — Telegram bot that gives you full Claude Code access to your server, with the added SOUL.md persona harness for durable persona/tone injection.",
   "type": "module",
   "main": "bot.js",
   "scripts": {
