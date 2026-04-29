@@ -2,17 +2,25 @@
   <img src="logo.png" alt="cogent42" width="120">
 </p>
 
-<h1 align="center">cogent42</h1>
+<h1 align="center">cogent42-plus-SOUL</h1>
 
-<p align="center"><strong>Full Claude Code access on your server, controlled from Telegram.</strong></p>
+<p align="center"><strong>Full Claude Code access on your server, controlled from Telegram — with a durable persona harness.</strong></p>
 
 <p align="center"><em>1 file &nbsp;|&nbsp; 3 dependencies &nbsp;|&nbsp; 2-minute setup &nbsp;|&nbsp; The anti-platform.</em></p>
 
 ---
 
+> **About this fork.** `cogent42-plus-SOUL` is a fork of [`cogent42/cogent42`](https://github.com/cogent42/cogent42) maintained at [`bfgpollara/cogent42-plus-soul`](https://github.com/bfgpollara/cogent42-plus-soul). All upstream functionality is preserved; this fork adds the **SOUL.md persona harness** — an optional markdown file that injects a durable persona, tone, and working-style guidance into Claude's runtime context on every query and scheduled task. See the [Persona (SOUL.md)](#persona-soulmd) section for details, and credit to the upstream project for everything else.
+
 cogent42 is a single-file Telegram bot that gives you complete Claude Code capabilities on any server -- bash, files, search, scheduled tasks, persistent memory -- all from your phone. No plugins, no YAML, no Docker. Clone it, run the setup, message your bot.
 
 ## Features
+
+### Added in this fork
+
+- **SOUL.md persona harness** -- optional `SOUL.md` file in the repo root defines a durable persona, tone, and working style that is injected into Claude's runtime context on every query and scheduled task. See [Persona (SOUL.md)](#persona-soulmd).
+
+### Inherited from upstream cogent42
 
 - **Full Claude Code access** -- bash, file read/write/edit, and search via Telegram
 - **Photo & document support** -- send images and files, Claude processes them on your server
@@ -29,7 +37,6 @@ cogent42 is a single-file Telegram bot that gives you complete Claude Code capab
 - **Smart message queue** -- messages that aren't injected are queued and auto-processed in order after the current task finishes
 - **Cancel in-flight queries** -- `/cancel` aborts the current query
 - **Bot personality** -- optional personality config that also evolves through knowledge extraction
-- **SOUL.md persona harness** -- optional `SOUL.md` file in the cogent42 directory defines a durable persona, tone, and working style that is injected into Claude's runtime context on every query and scheduled task
 - **Graceful shutdown** -- in-flight queries and scheduled jobs are cleanly aborted on SIGINT/SIGTERM
 - **Session resume fallback** -- automatically starts a fresh session if resume fails
 - **One-command updates** -- `/update` pulls the latest version from GitHub, restarts the bot, and confirms it's back online
@@ -46,8 +53,8 @@ cogent42 is a single-file Telegram bot that gives you complete Claude Code capab
 **Automated setup (recommended):**
 
 ```bash
-git clone https://github.com/cogent42/cogent42.git
-cd cogent42
+git clone https://github.com/bfgpollara/cogent42-plus-soul.git
+cd cogent42-plus-soul
 node setup.js
 ```
 
@@ -56,13 +63,15 @@ The interactive setup walks you through everything.
 **Manual setup:**
 
 ```bash
-git clone https://github.com/cogent42/cogent42.git
-cd cogent42
+git clone https://github.com/bfgpollara/cogent42-plus-soul.git
+cd cogent42-plus-soul
 cp .env.example .env
 # Edit .env with your tokens
 npm install
 node bot.js
 ```
+
+> Prefer the upstream version without SOUL.md? Clone [`cogent42/cogent42`](https://github.com/cogent42/cogent42) instead.
 
 ## Environment Variables
 
@@ -108,9 +117,11 @@ Claude parses your intent into a schedule. Tasks persist across restarts. Manage
 
 ## Persona (SOUL.md)
 
-`SOUL.md` is an optional markdown file placed in the cogent42 directory (alongside `bot.js`). If present, its contents are appended to Claude's runtime system context on every query and scheduled task. Use it for durable persona, tone, and working-style guidance.
+> This feature is the distinguishing addition of the `cogent42-plus-SOUL` fork; it is not present in upstream `cogent42`.
 
-- **Location:** `SOUL.md` in the cogent42 repo root
+`SOUL.md` is an optional markdown file placed in the repo root (alongside `bot.js`). If present, its contents are appended to Claude's runtime system context on every query and scheduled task. Use it for durable persona, tone, and working-style guidance.
+
+- **Location:** `SOUL.md` in the repo root
 - **Missing file:** silently skipped, no error
 - **Unreadable file:** a warning is logged to stderr and the bot continues without it
 - **Size cap:** content beyond 12,000 characters is truncated with a warning
@@ -148,11 +159,11 @@ No configuration. To opt out: `DISABLE_KNOWLEDGE_FALLBACK=true`.
 ## Architecture
 
 ```
-cogent42/
+cogent42-plus-soul/
   bot.js                  # Single-file entry point (ESM)
   ecosystem.config.cjs    # PM2 config (.cjs because project is ESM)
   setup.js                # Interactive setup script
-  SOUL.md                 # Optional persona harness (see Persona section)
+  SOUL.md                 # Optional persona harness (fork addition; see Persona section)
   SOUL.example.md         # Starter template for SOUL.md
   memory/                 # Session files + current.txt for persistence
   knowledge/              # knowledge.json, schedules.json
@@ -190,20 +201,15 @@ pm2 save && pm2 startup
 
 ## Development
 
-All work happens on the `dev` branch (or feature branches off `dev`). To release:
+This fork tracks upstream `cogent42/cogent42` and layers fork-specific changes (notably the SOUL.md persona harness) on top. Work happens on feature branches and is merged into the fork's default branch via PR.
 
-1. Open a PR from `dev` to `main`
-2. Merge the PR
-3. On `main`, run the appropriate bump command:
+The upstream release scripts in `package.json` (`release:patch` / `release:minor` / `release:major`) push tags to whichever remote `main` you have configured, so adapt them to this fork's release process before invoking.
 
-```bash
-npm run release:patch   # bug fixes (1.4.0 → 1.4.1)
-npm run release:minor   # new features (1.4.0 → 1.5.0)
-npm run release:major   # breaking changes (1.4.0 → 2.0.0)
-```
+## Credits
 
-This updates `package.json`, creates a git tag, pushes to `main`, and triggers a GitHub Release with auto-generated release notes.
+- Original project: [cogent42/cogent42](https://github.com/cogent42/cogent42) — all the upstream features listed above were built there.
+- This fork: [bfgpollara/cogent42-plus-soul](https://github.com/bfgpollara/cogent42-plus-soul) — adds the SOUL.md persona harness.
 
 ## License
 
-MIT
+MIT (inherited from upstream)
